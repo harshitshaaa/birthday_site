@@ -64,6 +64,21 @@ h1 {
     text-align: center;
     z-index: 1000;
 }
+	.final-box {
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 320px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
+}
 
 .hidden {
     display: none;
@@ -112,6 +127,9 @@ h1 {
     </div>
 	<div id="quizBox" class="quiz hidden">
     		<h2 id="question">Happy Birthday!! 🎂<br>Are you ready to be 25?</h2>
+		<div id="finalMessageBox" class="final-box hidden">
+    		<p id="finalText"></p>
+		</div>
     
     		<div class="options">
         		<button onclick="handleYes()">Yes</button>
@@ -147,6 +165,11 @@ function handleYes() {
         document.getElementById("question").innerHTML =
             "😂 You asked for it!";
         document.querySelector(".options").style.display = "none";
+
+        // 👇 Show final emotional message after short delay
+        setTimeout(() => {
+            typeFinalMessage();
+        }, 1500);
     }
 }
 
@@ -196,6 +219,37 @@ P.S. You will always be invited to my island.`;
 
     document.getElementById("question").innerHTML = "";
     typeWriter();
+}
+	function typeFinalMessage() {
+    let text = `25 surely is a unique number.
+
+Though it does come with responsibilities.
+Only the tough ones make it through...
+
+And if I know anyone in the whole world who can do it, it's you ❤️
+
+So let's do it.
+P.S. You will always be invited to my island.`;
+
+    let i = 0;
+    let speed = 35;
+
+    let box = document.getElementById("finalMessageBox");
+    let textEl = document.getElementById("finalText");
+
+    box.classList.remove("hidden");
+    textEl.innerHTML = "";
+
+    function type() {
+        if (i < text.length) {
+            textEl.innerHTML += 
+                text.charAt(i) === "\n" ? "<br>" : text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        }
+    }
+
+    type();
 }
 
 function updateCountdown() {
