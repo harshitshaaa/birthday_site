@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Surprise 🎂</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: white;
+    overflow: hidden;
+}
+
+.container {
+    padding: 20px;
+    margin-top: 20vh;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+#countdown {
+    font-size: 2rem;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.message {
+    display: none;
+    animation: fadeIn 2s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.8);}
+    to {opacity: 1; transform: scale(1);}
+}
+
+.balloon {
+    position: absolute;
+    bottom: -100px;
+    width: 50px;
+    height: 70px;
+    background: red;
+    border-radius: 50%;
+    animation: floatUp 8s linear infinite;
+}
+
+.quiz {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 300px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.hidden {
+    display: none;
+}
+
+.options {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.options button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #ff6b81;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    position: relative;
+}
+
+@keyframes floatUp {
+    from {transform: translateY(0);}
+    to {transform: translateY(-120vh);}
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    h1 { font-size: 1.5rem; }
+    #countdown { font-size: 1.5rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1 id="title">Countdown to Birthday 🎂</h1>
+    <div id="countdown"></div>
+
+    <div class="message" id="birthdayMessage">
+        <h1>🎉 Happy Birthday! 🎉</h1>
+        <p>Wishing you a day filled with love, joy, and surprises! 💖</p>
+	
+    </div>
+	<div id="quizBox" class="quiz hidden">
+    		<h2 id="question">Happy Birthday!! 🎂<br>Are you ready to be 25?</h2>
+    
+    		<div class="options">
+        		<button onclick="handleYes()">Yes</button>
+        		<button id="noBtn" onclick="handleNo()">No</button>
+    		</div>
+	</div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+// 🎯 SET YOUR BIRTHDAY DATE HERE
+let birthday = new Date("2026-03-27T00:00:00");
+
+let countdownEl = document.getElementById("countdown");
+let messageEl = document.getElementById("birthdayMessage");
+let titleEl = document.getElementById("title");
+
+let noClickCount = 0;
+let stage = 1;
+
+function showQuiz() {
+    document.getElementById("quizBox").classList.remove("hidden");
+}
+
+// YES FLOW
+function handleYes() {
+    if (stage === 1) {
+        document.getElementById("question").innerHTML =
+            "Are you sure? 😏";
+        stage = 2;
+    } else {
+        document.getElementById("question").innerHTML =
+            "😂 You asked for it!";
+        document.querySelector(".options").style.display = "none";
+    }
+}
+
+// NO FLOW
+function handleNo() {
+    let noBtn = document.getElementById("noBtn");
+
+    if (stage === 1 && noClickCount < 3) {
+        noClickCount++;
+
+        // Move button randomly
+        let x = Math.random() * (window.innerWidth - 100);
+        let y = Math.random() * (window.innerHeight - 50);
+
+        noBtn.style.position = "fixed";
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+
+    } else {
+        startTypingMessage();        
+        document.querySelector(".options").style.display = "none";
+    }
+}
+function startTypingMessage() {
+    let text = `25 surely is a unique number.
+
+Though it does come with responsibilities.
+Only the tough ones make it through...
+
+And if I know anyone in the whole world who can do it, it's you ❤️
+
+So let's do it.`;
+
+    let i = 0;
+    let speed = 40;
+
+    document.querySelector(".options").style.display = "none";
+
+    function typeWriter() {
+        if (i < text.length) {
+            document.getElementById("question").innerHTML += 
+                text.charAt(i) === "\n" ? "<br>" : text.charAt(i);
+            i++;
+            setTimeout(typeWriter, speed);
+        }     }
+
+    document.getElementById("question").innerHTML = "";
+    typeWriter();
+}
+
+function updateCountdown() {
+    let now = new Date();
+    let diff = birthday - now;
+
+    if (diff <= 0) {
+        countdownEl.style.display = "none";
+        titleEl.style.display = "none";
+        messageEl.style.display = "block";
+        startConfetti();
+        createBalloons();
+	showQuiz();
+        return;
+    }
+
+    let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    let minutes = Math.floor((diff / (1000 * 60)) % 60);
+    let seconds = Math.floor((diff / 1000) % 60);
+
+    countdownEl.innerHTML =
+        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+setInterval(updateCountdown, 1000);
+
+// 🎈 Balloons
+function createBalloons() {
+    for (let i = 0; i < 10; i++) {
+        let balloon = document.createElement("div");
+        balloon.classList.add("balloon");
+        balloon.style.left = Math.random() * 100 + "vw";
+        balloon.style.background = `hsl(${Math.random()*360}, 70%, 60%)`;
+        balloon.style.animationDuration = (5 + Math.random() * 5) + "s";
+        document.body.appendChild(balloon);
+    }
+}
+
+// 🎊 Confetti
+function startConfetti() {
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+
+    for (let i = 0; i < 150; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 6 + 2,
+            d: Math.random() * 100,
+            color: `hsl(${Math.random()*360},100%,50%)`,
+            tilt: Math.random() * 10 - 10
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach((c, i) => {
+            ctx.beginPath();
+            ctx.fillStyle = c.color;
+            ctx.fillRect(c.x, c.y, c.r, c.r);
+        });
+        update();
+    }
+
+    function update() {
+        confetti.forEach((c, i) => {
+            c.y += Math.cos(c.d) + 2;
+            c.x += Math.sin(c.d);
+
+            if (c.y > canvas.height) {
+                c.y = 0;
+                c.x = Math.random() * canvas.width;
+            }
+        });
+    }
+
+    setInterval(draw, 20);
+}
+
+// Resize canvas on screen change
+window.addEventListener("resize", () => {
+    document.getElementById("confetti").width = window.innerWidth;
+    document.getElementById("confetti").height = window.innerHeight;
+});
+
+</script>
+
+</body>
+</html>
